@@ -35,43 +35,31 @@
 % ==============================================================================
 \begin{titlepage}
     \centering
-    \vspace*{1.0cm}
+    \vspace*{1.5cm}
     
-    {\Huge \bfseries \textcolor{navy}{MiniBass: Low-Frequency Sound Field Optimization}}\\[0.6em]
-    {\LARGE \bfseries Design, Analysis, and Comparative Evaluation of Four Algorithmic Paradigms in an Enclosed Performance Venue}\\[1.5cm]
+    {\Large \textbf{Title:}}\\[0.6em]
+    {\Huge \bfseries \textcolor{navy}{MiniBass: Low-Frequency Sound Field Optimization and Multi-Source Active Control}}\\[2.0cm]
     
-    \rule{\linewidth}{1.5pt}\\[0.4cm]
-    {\large \textbf{Technical Research \& Engineering Benchmark Report}}\\[0.2cm]
-    \rule{\linewidth}{1.0pt}\\[2.0cm]
+    {\Large \textbf{Project:}}\\[0.6em]
+    {\LARGE Multi-Subwoofer Acoustic Field Synthesis and Algorithmic Optimization in Enclosed Performance Venues}\\[2.0cm]
     
-    \begin{minipage}{0.96\textwidth}
-        \centering
-        \textbf{\large Operational Context and Venue Specifications:}\\[0.8em]
-        \begin{tabular}{p{4.2cm}p{10.2cm}}
-            \textbf{Acoustic Volume:} & $10.0\text{ m} \times 12.0\text{ m} \times 2.8\text{ m}$ ($V = 336.0\text{ m}^3$, $T_{60} = 0.45\text{ s}$) \\
-            \textbf{Source Layout:} & Front-Stage Array ($y = 1.78\text{ m}$, $z = 0.40\text{ m}$, 8 Discrete Sites) \\
-            \textbf{Audience Footprint:} & $9.6\text{ m} \times 9.6\text{ m}$ ($0.2\text{ m}$ Boundary Margins, Ear Height $z = 1.10\text{ m}$) \\
-            \textbf{Receiver Partitions:} & 80 In-Sample Seats ($10 \times 8$ Grid) + 40 Held-Out Off-Grid Seats \\
-            \textbf{Frequency Domain:} & $20.0\text{ to }200.0\text{ Hz}$ (95 Refined Pure-Tone Frequencies) \\
-            \textbf{Target Reference:} & $80.0\text{ dB SPL}$ ($0.20\text{ Pa RMS}$, $\pm 3.0\text{ dB}$ Tolerance Corridor) \\
-            \textbf{Algorithms Evaluated:} & Layered Beam Search, SIMD Tensor Scanner, \\
-                                           & Multi-Seat Minimax, and RLT Bilinear Boundary Solver \\
-        \end{tabular}
-    \end{minipage}
+    {\Large \textbf{Course Code:}}\\[0.6em]
+    {\LARGE [Course Code]}\\[2.0cm]
     
     \vfill
     
-    \begin{minipage}{0.88\textwidth}
+    \begin{minipage}{0.85\textwidth}
         \centering
-        \textcolor{darkgray}{\small
-        \textbf{Document Classification:} Independent Engineering Evaluation and Synthesis Report\\
-        \textbf{Scope:} Optimization Algorithm Architectures, Acoustic Field Diagnostics, and Formal Verification\\
-        \textbf{Date:} November 2026\\
-        \textbf{Status:} Verified and Replicated on Canonical Main Branch
-        }
+        {\Large \textbf{Presented to:}}\\[0.6em]
+        {\LARGE [Instructor Name / Department]}\\[2.5cm]
+        
+        \begin{tabular}{rl}
+            \Large \textbf{Name:} & \Large [Student Name] \\[1.0em]
+            \Large \textbf{Reg Number:} & \Large [Registration Number] \\
+        \end{tabular}
     \end{minipage}
     
-    \vspace*{0.8cm}
+    \vspace*{1.5cm}
 \end{titlepage}
 
 % ==============================================================================
@@ -93,7 +81,7 @@
 
 Low-frequency sound reproduction ($20\text{--}200\text{ Hz}$) inside enclosed rectangular halls is fundamentally degraded by standing wave boundary reflections. These room modes generate severe spatial variations in sound pressure level (SPL), leaving individual audience seats subject to constructive peaks ($+10\text{ to }+15\text{ dB}$) or deep non-minimum-phase interference notches ($-15\text{ to }-25\text{ dB}$). Because these notches arise from destructive spatial interference rather than transducer deficiencies, global electrical equalization cannot resolve them without driving other seats into excessive resonance.
 
-This report presents a thorough investigation into the design, computational structure, empirical performance, and physical field behavior of **four distinct optimization algorithms** developed to synthesize multi-source bass arrays along the front stage of a $10.0 \times 12.0 \times 2.8\text{ m}$ performance venue ($V = 336\text{ m}^3$, $T_{60} = 0.45\text{ s}$). Rather than treating acoustic optimization as a single-objective black box, four differing algorithmic paradigms are formulated, executed, and benchmarked on identical physical data:
+This report presents a thorough investigation into the design, computational structure, empirical performance, and physical field behavior of \textbf{four distinct optimization algorithms} developed to synthesize multi-source bass arrays along the front stage of a $10.0 \times 12.0 \times 2.8\text{ m}$ performance venue ($V = 336\text{ m}^3$, $T_{60} = 0.45\text{ s}$). Rather than treating acoustic optimization as a single-objective black box, four differing algorithmic paradigms are formulated, executed, and benchmarked on identical physical data:
 \begin{enumerate}
     \item \textbf{Algorithm 0: Layered Beam Search Optimizer} (Heuristic multi-objective discrete search with beam width $W=32$ and Pareto filtering across RMS error, power, and enclosure displacement).
     \item \textbf{Algorithm 1: Vectorized Geometric Tensor Scanner} (High-throughput SIMD tensor evaluator directly maximizing the pooled audience cell pass rate within a $\pm 3.0\text{ dB}$ tolerance corridor).
@@ -101,13 +89,15 @@ This report presents a thorough investigation into the design, computational str
     \item \textbf{Algorithm 3: RLT Active Bilinear Boundary Solver} (Reformulation-Linearization Technique decomposing quadratic acoustic interference into self and cross terms to synthesize active boundary absorption dipoles).
 \end{enumerate}
 
-To ensure complete scientific rigor and avoid over-fitting, all four algorithms are evaluated across both **80 in-sample listener seats** and an independent partition of **40 held-out off-grid verification seats** across 95 discrete frequencies ($20\text{--}200\text{ Hz}$), as well as a dense continuous room field grid ($25 \times 30 = 750\text{ points}$). 
+To ensure complete scientific rigor and avoid over-fitting, all four algorithms are evaluated across both \textbf{80 in-sample listener seats} and an independent partition of \textbf{40 held-out off-grid verification seats} across 95 discrete frequencies ($20\text{--}200\text{ Hz}$), as well as a dense continuous room field grid ($25 \times 30 = 750\text{ points}$). 
 
-The benchmark proves that **no single algorithm dominates across all acoustic dimensions**:
-- **Algorithm 0** achieves the lowest room-wide RMS flatness error ($6.25\text{ dB}$ in-sample, $6.16\text{ dB}$ held-out), delivering the flattest global energy response.
-- **Algorithm 1** maximizes total audience cell compliance within the $\pm 3.0\text{ dB}$ corridor ($43.32\%$ in-sample, $41.47\%$ held-out), capturing 307 additional seat-tone cells over Algorithm 0.
-- **Algorithm 2** establishes superior audience fairness: every seat in the audience passes at least 24 discrete frequencies (compared to 10 for Algorithm 0 and 0 for Algorithm 3), while simultaneously cutting held-out worst-seat error to $9.48\text{ dB}$.
-- **Algorithm 3** operates as an active boundary absorber: by synthesizing an active phase-inverted dipole pair at stage center, it destructively absorbs $55.7\%\text{--}68.3\%$ of boundary modal cross-term energy while drawing only $1.95\text{ W}$ mean electrical power per tone (a $52\%$ reduction compared to Algorithms 1 and 2).
+The benchmark proves that \textbf{no single algorithm dominates across all acoustic dimensions}:
+\begin{itemize}
+    \item \textbf{Algorithm 0} achieves the lowest room-wide RMS flatness error ($6.25\text{ dB}$ in-sample, $6.16\text{ dB}$ held-out), delivering the flattest global energy response.
+    \item \textbf{Algorithm 1} maximizes total audience cell compliance within the $\pm 3.0\text{ dB}$ corridor ($43.32\%$ in-sample, $41.47\%$ held-out), capturing 307 additional seat-tone cells over Algorithm 0.
+    \item \textbf{Algorithm 2} establishes superior audience fairness: every seat in the audience passes at least 24 discrete frequencies (compared to 10 for Algorithm 0 and 0 for Algorithm 3), while simultaneously cutting held-out worst-seat error to $9.48\text{ dB}$.
+    \item \textbf{Algorithm 3} operates as an active boundary absorber: by synthesizing an active phase-inverted dipole pair at stage center, it destructively absorbs $55.7\%\text{--}68.3\%$ of boundary modal cross-term energy while drawing only $1.95\text{ W}$ mean electrical power per tone (a $52\%$ reduction compared to Algorithms 1 and 2).
+\end{itemize}
 
 All foundational electromechanical equations, continuous 3D Helmholtz Green's functions, Lean 4 formal certificates, and systematic literature citations are fully detailed in Appendices A through D, preserving the primary report focus on algorithmic design, performance trade-offs, and empirical acoustic field diagnostics.
 
@@ -296,8 +286,8 @@ Algorithm 3 utilizes this bilinear structure:
 \subsection{Benchmark Protocol and Hardware Menu}
 All four algorithms were executed on the identical physical room model and hardware catalog:
 \begin{itemize}
-    \item \textbf{Driver Catalog:} High-compliance 10-inch drivers (`s03` and `s04`), characterized by $f_s \approx 28\text{ Hz}$, $V_{as} \approx 65\text{ L}$, $Q_{ts} \approx 0.38$, $B l \approx 11.5\text{ N/A}$, $S_d \approx 0.0355\text{ m}^2$, and $M_{ms} \approx 0.065\text{ kg}$.
-    \item \textbf{Ported Enclosures:} Heavy-walled vented cabinets (`box-1458` and `box-83a0`), gross external volume $41.5\text{ L}$, net internal cavity volume $V_{\text{net}} = 29.8\text{ L}$ ($18\text{ mm}$ wall thickness), dual cylindrical ports ($r_i = 0.022\text{ m}, l = 0.16\text{ m}$, tuning frequency $f_b \approx 34\text{ Hz}$).
+    \item \textbf{Driver Catalog:} High-compliance 10-inch drivers (\texttt{s03} and \texttt{s04}), characterized by $f_s \approx 28\text{ Hz}$, $V_{as} \approx 65\text{ L}$, $Q_{ts} \approx 0.38$, $B l \approx 11.5\text{ N/A}$, $S_d \approx 0.0355\text{ m}^2$, and $M_{ms} \approx 0.065\text{ kg}$.
+    \item \textbf{Ported Enclosures:} Heavy-walled vented cabinets (\texttt{box-1458} and \texttt{box-83a0}), gross external volume $41.5\text{ L}$, net internal cavity volume $V_{\text{net}} = 29.8\text{ L}$ ($18\text{ mm}$ wall thickness), dual cylindrical ports ($r_i = 0.022\text{ m}, l = 0.16\text{ m}$, tuning frequency $f_b \approx 34\text{ Hz}$).
     \item \textbf{Active DSP Controls:} Discrete voltage gain $g \in \{1.0, 3.0\}$, pure delay $\tau \in \{0.0, 2.0\text{ ms}\}$, filter shape $F \in \{\text{Flat}, \text{Lowpass } 120\text{ Hz}\}$, and polarity $\sigma \in \{+1, -1\}$.
     \item \textbf{Evaluation Partitions:} 80 In-Sample seats ($10 \times 8$ grid) and 40 Held-Out off-grid seats across 95 pure tones ($20\text{--}200\text{ Hz}$).
 \end{itemize}
@@ -347,25 +337,25 @@ Table~\ref{tab:sub_profiles} details the exact physical deployment identified by
 \hline
 \textbf{Algorithm} & \textbf{Sub} & \textbf{Enclosure / Driver} & \textbf{Position} & \textbf{Gain} & \textbf{Delay} & \textbf{Filter / Polarity} \\ \hline
 \textbf{Algo 0: Beam Search} 
-& 1 & 10" Ported (`box-1458`, `s03`) & Pos 2 ($x = 3.39\text{ m}$) & 3.0 & $2.0\text{ ms}$ & Flat / $+1$ \\
-& 2 & 10" Ported (`box-1458`, `s03`) & Pos 3 ($x = 4.46\text{ m}$) & 3.0 & $2.0\text{ ms}$ & Flat / $+1$ \\
-& 3 & 10" Ported (`box-1458`, `s03`) & Pos 6 ($x = 7.68\text{ m}$) & 3.0 & $0.0\text{ ms}$ & $120\text{ Hz}$ Lowpass / $+1$ \\
-& 4 & 10" Ported (`box-83a0`, `s04`) & Pos 7 ($x = 8.75\text{ m}$) & 1.0 & $0.0\text{ ms}$ & $120\text{ Hz}$ Lowpass / $+1$ \\ \hline
+& 1 & 10" Ported (\texttt{box-1458}, \texttt{s03}) & Pos 2 ($x = 3.39\text{ m}$) & 3.0 & $2.0\text{ ms}$ & Flat / $+1$ \\
+& 2 & 10" Ported (\texttt{box-1458}, \texttt{s03}) & Pos 3 ($x = 4.46\text{ m}$) & 3.0 & $2.0\text{ ms}$ & Flat / $+1$ \\
+& 3 & 10" Ported (\texttt{box-1458}, \texttt{s03}) & Pos 6 ($x = 7.68\text{ m}$) & 3.0 & $0.0\text{ ms}$ & $120\text{ Hz}$ Lowpass / $+1$ \\
+& 4 & 10" Ported (\texttt{box-83a0}, \texttt{s04}) & Pos 7 ($x = 8.75\text{ m}$) & 1.0 & $0.0\text{ ms}$ & $120\text{ Hz}$ Lowpass / $+1$ \\ \hline
 \textbf{Algo 1: Tensor Scanner} 
-& 1 & 10" Ported (`box-1458`, `s03`) & Pos 2 ($x = 3.39\text{ m}$) & 3.0 & $0.0\text{ ms}$ & $120\text{ Hz}$ Lowpass / $+1$ \\
-& 2 & 10" Ported (`box-1458`, `s03`) & Pos 3 ($x = 4.46\text{ m}$) & 3.0 & $0.0\text{ ms}$ & Flat / $+1$ \\
-& 3 & 10" Ported (`box-1458`, `s03`) & Pos 6 ($x = 7.68\text{ m}$) & 3.0 & $0.0\text{ ms}$ & $120\text{ Hz}$ Lowpass / $+1$ \\
-& 4 & 10" Ported (`box-83a0`, `s04`) & Pos 7 ($x = 8.75\text{ m}$) & 3.0 & $0.0\text{ ms}$ & Flat / $+1$ \\ \hline
+& 1 & 10" Ported (\texttt{box-1458}, \texttt{s03}) & Pos 2 ($x = 3.39\text{ m}$) & 3.0 & $0.0\text{ ms}$ & $120\text{ Hz}$ Lowpass / $+1$ \\
+& 2 & 10" Ported (\texttt{box-1458}, \texttt{s03}) & Pos 3 ($x = 4.46\text{ m}$) & 3.0 & $0.0\text{ ms}$ & Flat / $+1$ \\
+& 3 & 10" Ported (\texttt{box-1458}, \texttt{s03}) & Pos 6 ($x = 7.68\text{ m}$) & 3.0 & $0.0\text{ ms}$ & $120\text{ Hz}$ Lowpass / $+1$ \\
+& 4 & 10" Ported (\texttt{box-83a0}, \texttt{s04}) & Pos 7 ($x = 8.75\text{ m}$) & 3.0 & $0.0\text{ ms}$ & Flat / $+1$ \\ \hline
 \textbf{Algo 2: Multi-Seat Minimax} 
-& 1 & 10" Ported (`box-1458`, `s03`) & Pos 2 ($x = 3.39\text{ m}$) & 3.0 & $0.0\text{ ms}$ & Flat / $+1$ \\
-& 2 & 10" Ported (`box-1458`, `s03`) & Pos 3 ($x = 4.46\text{ m}$) & 3.0 & $0.0\text{ ms}$ & $120\text{ Hz}$ Lowpass / $+1$ \\
-& 3 & 10" Ported (`box-1458`, `s03`) & Pos 6 ($x = 7.68\text{ m}$) & 3.0 & $2.0\text{ ms}$ & $120\text{ Hz}$ Lowpass / $+1$ \\
-& 4 & 10" Ported (`box-83a0`, `s04`) & Pos 7 ($x = 8.75\text{ m}$) & 3.0 & $2.0\text{ ms}$ & Flat / $+1$ \\ \hline
+& 1 & 10" Ported (\texttt{box-1458}, \texttt{s03}) & Pos 2 ($x = 3.39\text{ m}$) & 3.0 & $0.0\text{ ms}$ & Flat / $+1$ \\
+& 2 & 10" Ported (\texttt{box-1458}, \texttt{s03}) & Pos 3 ($x = 4.46\text{ m}$) & 3.0 & $0.0\text{ ms}$ & $120\text{ Hz}$ Lowpass / $+1$ \\
+& 3 & 10" Ported (\texttt{box-1458}, \texttt{s03}) & Pos 6 ($x = 7.68\text{ m}$) & 3.0 & $2.0\text{ ms}$ & $120\text{ Hz}$ Lowpass / $+1$ \\
+& 4 & 10" Ported (\texttt{box-83a0}, \texttt{s04}) & Pos 7 ($x = 8.75\text{ m}$) & 3.0 & $2.0\text{ ms}$ & Flat / $+1$ \\ \hline
 \textbf{Algo 3: RLT Bilinear Solver} 
-& 1 & 10" Ported (`box-1458`, `s03`) & Pos 2 ($x = 3.39\text{ m}$) & 3.0 & $0.0\text{ ms}$ & Flat / $+1$ (Dipole Front) \\
-& 2 & 10" Ported (`box-1458`, `s03`) & Pos 3 ($x = 4.46\text{ m}$) & 3.0 & $0.0\text{ ms}$ & $120\text{ Hz}$ Lowpass / \textbf{$-1$ (Active Sink)} \\
-& 3 & 10" Ported (`box-1458`, `s03`) & Pos 0 ($x = 1.25\text{ m}$) & 3.0 & $0.0\text{ ms}$ & $120\text{ Hz}$ Lowpass / $+1$ \\
-& 4 & 10" Ported (`box-83a0`, `s04`) & Pos 7 ($x = 8.75\text{ m}$) & 3.0 & $2.0\text{ ms}$ & Flat / $+1$ \\ \hline
+& 1 & 10" Ported (\texttt{box-1458}, \texttt{s03}) & Pos 2 ($x = 3.39\text{ m}$) & 3.0 & $0.0\text{ ms}$ & Flat / $+1$ (Dipole Front) \\
+& 2 & 10" Ported (\texttt{box-1458}, \texttt{s03}) & Pos 3 ($x = 4.46\text{ m}$) & 3.0 & $0.0\text{ ms}$ & $120\text{ Hz}$ Lowpass / \textbf{$-1$ (Active Sink)} \\
+& 3 & 10" Ported (\texttt{box-1458}, \texttt{s03}) & Pos 0 ($x = 1.25\text{ m}$) & 3.0 & $0.0\text{ ms}$ & $120\text{ Hz}$ Lowpass / $+1$ \\
+& 4 & 10" Ported (\texttt{box-83a0}, \texttt{s04}) & Pos 7 ($x = 8.75\text{ m}$) & 3.0 & $2.0\text{ ms}$ & Flat / $+1$ \\ \hline
 \end{tabular}%
 }
 \end{table}
@@ -379,7 +369,7 @@ Table~\ref{tab:sub_profiles} details the exact physical deployment identified by
     \item \textbf{Geometric Asymmetry Breaks Modal Degeneracy (Ablation 1):} Moving to the asymmetric positions ($x = 3.39, 4.46, 7.68, 8.75\text{ m}$) without DSP reduces RMS error to $6.59\text{ dB}$ ($6.44\text{ dB}$ on held-out seats). This proves that asymmetric physical boundary spacing decorrelates transverse standing wave nodes, providing a significant physical improvement before any active filtering is applied.
     \item \textbf{Role of Differentiated DSP (Ablations 2 \& 3):} Introducing a $2.0\text{ ms}$ pure delay on stage-left subwoofers provides an acoustic path delay of $c \tau = 343 \times 0.002 = 0.686\text{ m}$, introducing a frequency-dependent phase shift $\Delta \phi = \omega \tau$ ($28.8^\circ$ at $40\text{ Hz}$, $86.4^\circ$ at $120\text{ Hz}$). When combined with $120\text{ Hz}$ single-pole lowpass filtering on stage-right, the array decouples high-modal-overlap frequencies ($120\text{--}200\text{ Hz}$) from the stage-right boundary. Algorithm 0 achieves the global optimum of $6.25\text{ dB}$ RMS error ($6.16\text{ dB}$ held-out).
     \item \textbf{Cell Compliance vs. Quadratic Flatness (Algo 0 vs. Algo 1):} While Algorithm 0 achieves the lowest quadratic RMS error ($6.25\text{ dB}$ vs $6.57\text{ dB}$), Algorithm 1 achieves a substantially higher cell pass rate ($43.32\%$ vs $39.28\%$). Across the 7,600 seat-frequency points in the venue, Algorithm 1 captures $3,292\text{ compliant points}$ ($307$ more than Algorithm 0). Sound contractors evaluating venues via strict $\pm 3.0\text{ dB}$ corridor gates will observe higher compliance under Algorithm 1.
-    \item \textbf{Audience Fairness and Elimination of Dead Zones (Algo 2):} In Algorithm 0, the worst seat in the hall passes only 10 out of 95 frequencies. In Algorithm 2, the worst seat passes **24 frequencies**—a $140\%$ improvement in worst-case compliance. Furthermore, Algorithm 2 lowers held-out worst-seat error to $9.48\text{ dB}$ (the lowest among all configurations).
+    \item \textbf{Audience Fairness and Elimination of Dead Zones (Algo 2):} In Algorithm 0, the worst seat in the hall passes only 10 out of 95 frequencies. In Algorithm 2, the worst seat passes \textbf{24 frequencies}—a $140\%$ improvement in worst-case compliance. Furthermore, Algorithm 2 lowers held-out worst-seat error to $9.48\text{ dB}$ (the lowest among all configurations).
     \item \textbf{Active Boundary Absorption and Power Efficiency (Algo 3):} Algorithm 3 proves that destructive phase synthesis acts as an active acoustic sink. The stage-center pair ($x = 3.39\text{ m}$ positive polarity, $x = 4.46\text{ m}$ inverted polarity) absorbs modal cross-term reflections off the front boundary. This configuration requires only $1.95\text{ W}$ mean electrical power per test tone ($185.6\text{ W}$ total), compared to $4.09\text{ W}$ ($388.4\text{ W}$) for Algorithms 1 and 2.
     \item \textbf{Absence of Spatial Overfitting Across All Algorithms:} Evaluating all four algorithms on the 40 held-out off-grid listener positions demonstrates that held-out performance tracks in-sample performance within $0.03\text{--}0.27\text{ dB}$. This confirms that all four algorithms physically alter the continuous acoustic wave field of the room rather than overfitting to discrete training nodes.
 \end{enumerate}
@@ -649,7 +639,7 @@ Let $C(S) = \frac{1}{R} \sum_{r=1}^R \prod_{k=1}^K \mathbf{1}_{[p_{\text{lo}}, p
 
 For $C(S) \ge 0.95$, at least $76$ of the $80$ seats must pass all 95 frequencies simultaneously. However, across all $104,145$ physical configurations evaluated:
 \begin{enumerate}
-    \item The maximum number of frequencies passed by any single seat under any configuration is **64 out of 95 tones** ($67.4\%$).
+    \item The maximum number of frequencies passed by any single seat under any configuration is \textbf{64 out of 95 tones} ($67.4\%$).
     \item No seat in the room under any configuration satisfies all 95 frequencies ($k_r \le 64 < 95, \forall r$).
     \item Therefore, $\prod_{k=1}^{95} \mathbf{1}_{[p_{\text{lo}}, p_{\text{hi}}]}(|p(r, k)|) = 0$ for all $r \in \{1 \dots 80\}$.
 \end{enumerate}
