@@ -261,3 +261,4 @@ def precompute_atom_tensors(
         "designs": {d.id: d for d in designs},
         "controls": controls,
     }
+

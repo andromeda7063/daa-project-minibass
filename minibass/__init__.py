@@ -9,9 +9,13 @@ Exports:
 
 from .algorithms import (
     EvaluationResult,
+    LayeredBeamSearchOptimizer,
     MultiSeatMinimaxOptimizer,
     RLTActiveBilinearSolver,
     VectorizedGeometricScanner,
+    prune_nondominated,
+    search_instance,
+    select_beam,
 )
 from .data_generation import (
     active_filter_from_record,
@@ -50,6 +54,7 @@ __all__ = [
     "DriverMount",
     "Environment",
     "EvaluationResult",
+    "LayeredBeamSearchOptimizer",
     "MultiSeatMinimaxOptimizer",
     "Port",
     "RLTActiveBilinearSolver",
@@ -64,7 +69,11 @@ __all__ = [
     "evaluate_system_configuration",
     "net_volume_m3",
     "precompute_atom_tensors",
+    "prune_nondominated",
     "rectangular_transfer",
     "run_10x12_dryrun",
+    "search_instance",
+    "select_beam",
     "validate_design",
 ]
+

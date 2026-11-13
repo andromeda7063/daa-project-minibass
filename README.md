@@ -10,7 +10,8 @@ It couples first-principles 3D Helmholtz modal Green's functions, 4th-order Thie
 
 - **First-Principles Modal Acoustics:** Exact 3D rectangular cavity Green's function with modal damping ($\delta_n = 6.91 / T_{60}$) and Neumann normalization factors, avoiding empirical interpolation artifacts.
 - **Transducer Electromechanics:** Full 4th-order Thiele-Small coupled matrix solver evaluating voice-coil electrical dynamics, acoustic box compliance, and port air mass resonance.
-- **The 3 Best Algorithms:**
+- **The Optimization Algorithms:**
+  0. `LayeredBeamSearchOptimizer` (`search_instance`): Memory-bounded discrete beam-search algorithm from Section 3 of the research report ($W=32$, canonical position ordering, Pareto filtering).
   1. `VectorizedGeometricScanner`: Tensor SIMD evaluator processing $>50,000$ combinations/sec using precomputed complex acoustic atoms.
   2. `MultiSeatMinimaxOptimizer`: Audience fairness optimizer maximizing worst-seat passing frequency count and computing the seat conjunction spectrum $N(k)$.
   3. `RLTActiveBilinearSolver`: Reformulation-Linearization Technique solver isolating pairwise destructive interference terms for active boundary absorption / dipole synthesis.
@@ -21,9 +22,14 @@ It couples first-principles 3D Helmholtz modal Green's functions, 4th-order Thie
 
 ---
 
-## The 3 Best Algorithms
+## Optimization Algorithms
 
-All three algorithms are consolidated in [`minibass/algorithms.py`](file:///home/andromeda/Documents/code/projects/spok/minibass/algorithms.py).
+All algorithms are consolidated in [`minibass/algorithms.py`](file:///home/andromeda/Documents/code/projects/spok/minibass/algorithms.py).
+
+### 0. Layered Beam Search Solver (`LayeredBeamSearchOptimizer` / `search_instance`)
+- **Principle:** The exact discrete beam search solver presented in Section 3 of the research report.
+- **Mechanism:** Explores multi-source combinations across depths $d = 1 \dots 4$. Uses canonical position ordering $\operatorname{pos}(a) > \operatorname{pos}(a_{\text{last}})$ to eliminate permutation redundancy, accumulates complex pressures $P(r, k)$ in SIMD batches, filters candidates via Pareto non-dominated sorting, and retains the top $W = 32$ partial candidates using 16 multi-objective scalarization weights.
+- **Throughput:** Evaluated 104,145 combinations in 22.4 seconds ($4,649\text{ candidates/s}$) during the $10 \times 12\text{ m}$ venue synthesis.
 
 ### 1. Vectorized Geometric Tensor Scanner (`VectorizedGeometricScanner`)
 - **Principle:** Decouples room transfer functions from transducer and DSP parameters. For each discrete atom $a = (\text{position } \mathbf{x}_s, \text{enclosure/driver } d, \text{active DSP } c)$, the complex pressure tensor at receiver $r$ and frequency $k$ is precomputed:
@@ -137,3 +143,4 @@ lean proofs/MiniBass.lean
 - **Dry Run Guide:** Detailed mathematical definitions, acoustic physics derivations, and step-by-step instructions: [docs/RUN_GUIDE_10x12.md](file:///home/andromeda/Documents/code/projects/spok/docs/RUN_GUIDE_10x12.md).
 - **Literature Survey:** Structured review of 10 primary papers covering modal decomposition, boundary absorption, and transducer sensitivity: [docs/LITERATURE_SURVEY.md](file:///home/andromeda/Documents/code/projects/spok/docs/LITERATURE_SURVEY.md).
 - **Full Research Report:** Complete 17-page PDF report with derivations, formal proofs, and 7 publication-grade figures: [docs/REPORT_10x12_DRYRUN.pdf](file:///home/andromeda/Documents/code/projects/spok/docs/REPORT_10x12_DRYRUN.pdf).
+

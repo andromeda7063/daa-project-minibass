@@ -87,3 +87,4 @@ This document catalogs the peer-reviewed scientific literature governing the mat
 - **Paper:** *Vented-Box Loudspeaker Systems (Parts I--IV)*, Journal of the Audio Engineering Society, vol. 21, nos. 5--8, 1973.
 - **Authors:** Richard H. Small
 - **Exact Inference Used:** Fourth-order coupled matrix equations mapping voice-coil voltage to diaphragm and port volume velocity, enabling physics-based simulation of vented cabinets.
+

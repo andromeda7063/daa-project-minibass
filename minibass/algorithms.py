@@ -1,6 +1,12 @@
-"""The 3 Best Algorithms for Rectangular Room Low-Frequency Acoustic Optimization in MiniBass.
+"""Optimization Algorithms for Rectangular Room Low-Frequency Acoustics in MiniBass.
 
-Consolidates the three top-performing algorithmic methodologies:
+Consolidates the optimization algorithms:
+
+0. LayeredBeamSearchOptimizer (search_instance):
+   The exact memory-bounded discrete beam search detailed in Section 3 of the research report.
+   Performs layered expansion (d = 1..max_boxes) over precomputed complex atom tensors,
+   filtering with canonical position ordering pos(a) > pos(a_last), Pareto non-dominated front
+   tracking, and multi-objective scalarized beam retention (W = 32).
 
 1. VectorizedGeometricScanner:
    High-throughput tensor-vectorized acoustic evaluator using precomputed complex
@@ -24,6 +30,7 @@ from __future__ import annotations
 
 import itertools
 import math
+import time
 from dataclasses import dataclass
 from typing import Any, Sequence
 
@@ -48,6 +55,233 @@ class EvaluationResult:
     seat_tones: list[int]
     total_volume_m3: float
     mean_power_w: float
+
+
+# ==============================================================================
+# ALGORITHM 0: Layered Beam Search Optimizer (Report Section 3)
+# ==============================================================================
+
+_WEIGHTS = np.asarray([
+    [1.0, 0.02, 0.02, 0.02],
+    [0.02, 1.0, 0.02, 0.02],
+    [0.02, 0.02, 1.0, 0.02],
+    [0.02, 0.02, 0.02, 1.0],
+    [1.0, 1.0, 0.1, 0.1],
+    [1.0, 0.1, 1.0, 0.1],
+    [1.0, 0.1, 0.1, 1.0],
+    [0.1, 1.0, 1.0, 0.1],
+    [0.1, 1.0, 0.1, 1.0],
+    [0.1, 0.1, 1.0, 1.0],
+    [1.0, 1.0, 1.0, 1.0],
+    [2.0, 1.0, 1.0, 0.2],
+    [1.0, 2.0, 0.2, 1.0],
+    [2.0, 2.0, 0.1, 0.1],
+    [1.0, 0.5, 0.2, 0.5],
+    [0.5, 1.0, 0.5, 0.2],
+])
+
+
+def _objective_vector(metrics: dict[str, float]) -> np.ndarray:
+    return np.array([
+        metrics["response_error_db"],
+        -metrics["coverage"],
+        metrics["electrical_effort_w"],
+        metrics["outer_volume_m3"],
+    ])
+
+
+def _score_candidates(records: list[dict[str, Any]]) -> np.ndarray:
+    v = np.asarray([_objective_vector(r["metrics"]) for r in records])
+    v[:, 0] /= 20.0
+    v[:, 1] += 1.0
+    v[:, 2] = np.log1p(np.maximum(v[:, 2], 0.0)) / 5.0
+    v[:, 3] /= 0.4
+    return v @ _WEIGHTS.T
+
+
+def prune_nondominated(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Pareto dominance filter over multi-objective vectors."""
+    ordered = sorted(records, key=lambda r: (tuple(_objective_vector(r["metrics"])), tuple(r["selection"])))
+    front: list[dict[str, Any]] = []
+    values = np.empty((0, 4))
+    for r in ordered:
+        v = _objective_vector(r["metrics"])
+        if len(values) > 0 and np.any(np.all(values <= v, axis=1)):
+            continue
+        keep = ~np.all(v <= values, axis=1)
+        front = [x for x, k in zip(front, keep) if k]
+        values = np.vstack((values[keep], v))
+        front.append(r)
+    return sorted(front, key=lambda r: tuple(r["selection"]))
+
+
+def select_beam(records: list[dict[str, Any]], beam_width: int) -> list[dict[str, Any]]:
+    """Select top candidates across all multi-objective scalarization weights."""
+    if len(records) <= beam_width:
+        return sorted(records, key=lambda r: tuple(r["selection"]))
+    scores = _score_candidates(records)
+    orders = [
+        sorted(range(len(records)), key=lambda i: (scores[i, k], tuple(records[i]["selection"])))
+        for k in range(_WEIGHTS.shape[0])
+    ]
+    chosen = []
+    for rank in range(len(records)):
+        for order in orders:
+            idx = order[rank]
+            if idx not in chosen:
+                chosen.append(idx)
+                if len(chosen) == beam_width:
+                    return [records[i] for i in chosen]
+    return [records[i] for i in chosen]
+
+
+class LayeredBeamSearchOptimizer:
+    """Discrete memory-bounded layered beam search optimizer as detailed in Section 3 of the report.
+    
+    Explores depths d = 1..max_boxes using canonical position ordering pos(a) > pos(a_last),
+    vectorized complex matrix additions in SIMD batches, Pareto filtering, and multi-objective
+    scalarized beam retention (W = 32).
+    """
+
+    def __init__(
+        self,
+        raw_instance: dict[str, Any],
+        atom_data: dict[str, Any],
+        beam_width: int = 32,
+        chunk_size: int = 256,
+    ) -> None:
+        self.raw = raw_instance
+        self.atom_data = atom_data
+        self.beam_width = beam_width
+        self.chunk_size = chunk_size
+
+        self.target = float(raw_instance["target_pa_rms"])
+        self.tol = float(raw_instance["tolerance_db"])
+        self.lower = 10 ** (-self.tol / 20.0) * self.target
+        self.upper = 10 ** (self.tol / 20.0) * self.target
+
+        self.frequencies = np.asarray(raw_instance["frequencies_hz"], dtype=float)
+        self.n_freqs = len(self.frequencies)
+
+        self.keys = atom_data["keys"]
+        self.atom_pressures = atom_data["atom_pressures"]  # [N_atoms, S, F]
+        self.atom_powers = atom_data["atom_powers"]        # [N_atoms, F]
+        self.atom_volumes = atom_data["atom_volumes"]      # [N_atoms]
+        self.controls = atom_data["controls"]
+        self.designs = atom_data.get("designs", {})
+        self.n_atoms = len(self.keys)
+
+    def search(
+        self,
+        max_boxes: int = 4,
+        max_evaluations: int | None = None,
+        time_limit_s: float | None = None,
+    ) -> dict[str, Any]:
+        """Execute layered beam search across depths d = 1..max_boxes."""
+        started = time.perf_counter()
+
+        zero_p = np.zeros(self.atom_pressures.shape[1:], dtype=complex)
+        zero_pow = np.zeros(self.n_freqs, dtype=float)
+        empty = {
+            "selection": (),
+            "metrics": {
+                "response_error_db": 20.0,
+                "coverage": 0.0,
+                "electrical_effort_w": 0.0,
+                "outer_volume_m3": 0.0,
+            },
+        }
+
+        front = [empty]
+        beam = [empty]
+        evaluated = 0
+        depth_stats = []
+
+        for depth in range(1, max_boxes + 1):
+            pool = []
+            generated = 0
+            for parent in sorted(beam, key=lambda r: tuple(r["selection"])):
+                sel = parent["selection"]
+                last_pos = self.keys[sel[-1]][0] if sel else -1
+
+                # Canonical position ordering: pos(a) > pos(a_last)
+                cand_indices = [i for i in range(self.n_atoms) if self.keys[i][0] > last_pos]
+                if not cand_indices:
+                    continue
+
+                parent_p = sum((self.atom_pressures[i] for i in sel), start=zero_p.copy())
+                parent_pow = sum((self.atom_powers[i] for i in sel), start=zero_pow.copy())
+                parent_vol = sum((self.atom_volumes[i] for i in sel), start=0.0)
+
+                for offset in range(0, len(cand_indices), self.chunk_size):
+                    if max_evaluations and evaluated >= max_evaluations:
+                        break
+                    if time_limit_s and (time.perf_counter() - started) >= time_limit_s:
+                        break
+
+                    chunk = cand_indices[offset : offset + self.chunk_size]
+                    p_chunk = parent_p[None, :, :] + self.atom_pressures[chunk]
+                    mag = np.abs(p_chunk)
+
+                    diff_db = 20.0 * np.log10(np.maximum(mag / self.target, 1e-12))
+                    errs = np.sqrt(np.mean(diff_db ** 2, axis=(1, 2)))
+
+                    in_band = (mag >= self.lower) & (mag <= self.upper)
+                    covs = np.mean(np.all(in_band, axis=2), axis=1)
+
+                    pow_chunk = np.mean(parent_pow[None, :] + self.atom_powers[chunk], axis=1)
+                    vol_chunk = parent_vol + self.atom_volumes[chunk]
+
+                    records = [
+                        {
+                            "selection": sel + (chunk[k],),
+                            "metrics": {
+                                "response_error_db": float(errs[k]),
+                                "coverage": float(covs[k]),
+                                "electrical_effort_w": float(pow_chunk[k]),
+                                "outer_volume_m3": float(vol_chunk[k]),
+                            },
+                        }
+                        for k in range(len(chunk))
+                    ]
+                    evaluated += len(records)
+                    generated += len(records)
+                    front = prune_nondominated(front + records)
+
+                    batch_beam = select_beam(records, self.beam_width)
+                    pool = select_beam(pool + batch_beam, self.beam_width)
+
+            beam = pool
+            depth_stats.append({
+                "depth": depth,
+                "generated": generated,
+                "beam_size": len(beam),
+                "nondominated_size": len(front),
+            })
+
+        elapsed = time.perf_counter() - started
+        best_record = min(front, key=lambda r: r["metrics"]["response_error_db"]) if front else empty
+
+        return {
+            "best_record": best_record,
+            "nondominated_front": front,
+            "depth_stats": depth_stats,
+            "total_evaluated": evaluated,
+            "elapsed_s": elapsed,
+            "combinations_per_sec": evaluated / max(elapsed, 1e-6),
+        }
+
+
+def search_instance(
+    raw_instance: dict[str, Any],
+    atom_data: dict[str, Any],
+    beam_width: int = 32,
+    max_boxes: int = 4,
+    time_limit_s: float | None = None,
+) -> dict[str, Any]:
+    """Execute the exact layered beam search solver described in Section 3 of the report."""
+    optimizer = LayeredBeamSearchOptimizer(raw_instance, atom_data, beam_width=beam_width)
+    return optimizer.search(max_boxes=max_boxes, time_limit_s=time_limit_s)
 
 
 # ==============================================================================
@@ -343,3 +577,4 @@ class RLTActiveBilinearSolver:
             "destructive_cancellation_ratio": float(best_interference_ratio),
             "cross_term_suppression_pct": float(max(0.0, (1.0 - best_interference_ratio) * 100.0)),
         }
+

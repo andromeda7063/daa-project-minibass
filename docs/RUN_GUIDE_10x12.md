@@ -89,3 +89,4 @@ All high-resolution figures are located in [`docs/figures/`](file:///home/androm
 - `dryrun_10x12_frequency_response_corridor.png` (and `.svg`): All 80 seat curves, spatial mean, and $\pm 1$ SD corridor.
 - `dryrun_10x12_modal_slices_20_50_100_200hz.png` (and `.svg`): Exact Helmholtz Green's function standing wave slices at 20, 50, 100, and 200 Hz.
 - `dryrun_10x12_seat_histogram.png` (and `.svg`): Passing tone distribution across audience seats.
+

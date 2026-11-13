@@ -2,3 +2,4 @@
 
 from minibass import *
 from minibass import __version__
+
