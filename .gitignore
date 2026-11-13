@@ -20,3 +20,8 @@ wheels/
 *.toc
 *.lof
 *.lot
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.tex
+*.pdf
