@@ -17,3 +17,6 @@ wheels/
 /scratch/
 *.aux
 *.log
+*.toc
+*.lof
+*.lot
