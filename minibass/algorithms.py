@@ -513,6 +513,8 @@ class MultiSeatMinimaxOptimizer:
     def compute_conjunction_spectrum(seat_tones: Sequence[int]) -> dict[int, int]:
         """Compute N(k) = number of seats passing at least k tones simultaneously."""
         tones = np.asarray(seat_tones, dtype=int)
+        if len(tones) == 0:
+            return {}
         spectrum = {}
         for k in range(0, int(np.max(tones)) + 1):
             spectrum[k] = int(np.sum(tones >= k))

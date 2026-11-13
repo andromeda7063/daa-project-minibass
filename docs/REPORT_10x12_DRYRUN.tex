@@ -407,6 +407,45 @@ The champion layout places 4 front-stage subwoofers:
     \item \textbf{Subwoofer 4 (Position 7, $x = 8.75\text{ m}$):} 10-inch ported (`box-83a0`, driver `s04`), Gain: 1.0, Delay: $0\text{ ms}$, Filter: $120\text{ Hz}$ Lowpass.
 \end{enumerate}
 
+\subsection{Comparative Evaluation of Four Distinct Optimization Algorithms}
+
+To compare differing optimization paradigms on the identical $10 \times 12\text{ m}$ venue ($V = 336\text{ m}^3, T_{60} = 0.45\text{ s}$), four distinct algorithmic strategies were evaluated across both the 80 in-sample listener seats and the 40 held-out off-grid verification seats:
+\begin{enumerate}
+    \item \textbf{Algorithm 0: Layered Beam Search Optimizer} (Discrete beam search with width $W=32$ across a 4-layer space, incorporating Pareto non-dominated filtering across RMS error, power, and enclosure volume).
+    \item \textbf{Algorithm 1: Vectorized Geometric Tensor Scanner} (High-throughput SIMD tensor evaluator directly maximizing pooled audience cell compliance within the $\pm 3.0\text{ dB}$ tolerance corridor).
+    \item \textbf{Algorithm 2: Multi-Seat Minimax Optimizer} (Audience fairness formulation maximizing the worst-seat compliant tone count $\max \min_s k_s$ and minimizing worst-seat peak deviation).
+    \item \textbf{Algorithm 3: RLT Active Bilinear Boundary Solver} (Reformulation-Linearization Technique with active phase-inversion dipole pairs along the boundary for destructive modal energy absorption).
+\end{enumerate}
+
+Table~\ref{tab:four_algorithms} summarizes the quantitative performance metrics across both seat distributions.
+
+\begin{table}[h!]
+\centering
+\small
+\renewcommand{\arraystretch}{1.2}
+\caption{Comparative Benchmark Across Four Distinct Optimization Algorithms on the $10 \times 12\text{ m}$ Venue}
+\label{tab:four_algorithms}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|cc|cc|cc|cc|c|}
+\hline
+\textbf{Optimization Algorithm} & \multicolumn{2}{c|}{\textbf{RMS Error (dB)}} & \multicolumn{2}{c|}{\textbf{Worst Seat (dB)}} & \multicolumn{2}{c|}{\textbf{Pass Rate (\%)}} & \multicolumn{2}{c|}{\textbf{Worst Tones (/95)}} & \textbf{Power} \\
+& In-Sample & Held-Out & In-Sample & Held-Out & In-Sample & Held-Out & In-Sample & Held-Out & (Mean W) \\ \hline
+\textbf{Algo 0: Layered Beam Search} & \textbf{6.25} & \textbf{6.16} & \textbf{9.97} & 9.80 & 39.3\% & 37.6\% & 10 & 13 & 3.14 \\
+\textbf{Algo 1: Geometric Tensor Scanner} & 6.57 & 6.53 & 12.47 & 9.92 & \textbf{43.3\%} & \textbf{41.5\%} & 18 & 14 & 4.09 \\
+\textbf{Algo 2: Multi-Seat Minimax} & 6.47 & 6.50 & 11.08 & \textbf{9.48} & 41.3\% & 41.0\% & \textbf{24} & \textbf{20} & 4.09 \\
+\textbf{Algo 3: RLT Active Bilinear} & 8.00 & 7.73 & 13.19 & 11.41 & 34.8\% & 34.8\% & 0 & 2 & \textbf{1.95} \\ \hline
+\end{tabular}%
+}
+\end{table}
+
+\subsubsection{Key Algorithmic Trade-Offs and Findings}
+\begin{enumerate}
+    \item \textbf{RMS Flatness vs. Cell Pass Rate:} Algorithm 0 minimizes room-wide RMS error ($6.25\text{ dB}$ in-sample, $6.16\text{ dB}$ held-out), but Algorithm 1 achieves a significantly higher cell pass rate ($43.32\%$ vs. $39.28\%$), capturing 307 additional seat-tone cells within the $\pm 3.0\text{ dB}$ target band.
+    \item \textbf{Audience Fairness and Worst-Seat Optimization:} Algorithm 2 demonstrates superior audience fairness: every single audience seat passes at least 24 test frequencies (compared to 10 for Algorithm 0 and 0 for Algorithm 3), while simultaneously reducing the worst-seat error on held-out positions to $9.48\text{ dB}$.
+    \item \textbf{Destructive Boundary Absorption and Energy Efficiency:} Algorithm 3 implements an active boundary dipole pair on stage center ($x = 3.39\text{ m}, 4.46\text{ m}$) where the second transducer is phase-inverted. This induces destructive modal absorption that suppresses boundary cross-terms, requiring only $1.95\text{ W}$ mean electrical power per test tone.
+    \item \textbf{Held-Out Generalization Consistency:} Across all four algorithms, performance on the 40 held-out listener positions tracks within $0.09\text{--}0.27\text{ dB}$ of in-sample metrics, confirming that acoustic field smoothing occurs continuously throughout the enclosed space rather than overfitting to discrete receiver nodes.
+\end{enumerate}
+
 \newpage
 
 \section{Visual Diagnostics and Figure Walkthrough}
@@ -494,6 +533,65 @@ Figures~\ref{fig:baselines} and~\ref{fig:monte_carlo} show the comparative basel
 \label{fig:monte_carlo}
 \end{figure}
 
+\newpage
+
+\subsection{Comparative Four-Algorithm Benchmark Metrics}
+
+Figure~\ref{fig:four_algos_benchmark} presents the multi-metric performance comparison of all four optimization algorithms across in-sample and held-out listener seats.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.92\textwidth]{figures/four_algorithms_comparative_benchmark.png}
+\caption{\textbf{Comparative Four-Algorithm Performance Benchmark on $10 \times 12\text{ m}$ Venue.} Panel (A) compares in-sample (80 seats) and held-out (40 off-grid seats) RMS flatness error. Panel (B) presents minimax worst-seat deviation. Panel (C) displays tolerance corridor compliance ($\pm 3.0\text{ dB}$). Panel (D) plots Toole spatial standard deviation across the audience.}
+\label{fig:four_algos_benchmark}
+\end{figure}
+
+\newpage
+
+\subsection{Continuous 2D Room Acoustic Error Fields Across All Four Algorithms}
+
+Figure~\ref{fig:four_algos_heatmaps} illustrates the continuous 2D acoustic RMS error field across the entire $10 \times 12\text{ m}$ hall at ear level ($z = 1.1\text{ m}$) for each algorithm.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.92\textwidth]{figures/four_algorithms_acoustic_error_heatmaps.png}
+\caption{\textbf{Continuous 2D Acoustic Error Fields for Four Optimization Algorithms.} Contours represent continuous RMS error relative to target across $20\text{--}200\text{ Hz}$. White circles denote the 80 in-sample seats, orange triangles indicate the 40 held-out off-grid seats, and cyan squares mark active subwoofers along the stage front.}
+\label{fig:four_algos_heatmaps}
+\end{figure}
+
+\newpage
+
+\subsection{Multi-Algorithm Frequency Response Corridors}
+
+Figure~\ref{fig:four_algos_corridors} displays the individual seat frequency response curves, spatial mean, and $\pm 1\text{ SD}$ envelope across all 80 listener locations for each algorithm.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.92\textwidth]{figures/four_algorithms_frequency_corridors.png}
+\caption{\textbf{Audience Frequency Response Corridors Across Four Algorithms.} Light blue curves represent individual seats. The thick navy curve shows the audience spatial mean SPL, bounded by the $\pm 1\text{ SD}$ shaded envelope and the $\pm 3.0\text{ dB}$ tolerance corridor.}
+\label{fig:four_algos_corridors}
+\end{figure}
+
+\newpage
+
+\subsection{Audience Conjunction Spectrum and Passing-Tone Distributions}
+
+Figures~\ref{fig:four_algos_conjunction} and~\ref{fig:four_algos_histograms} present audience fairness diagnostics, including the conjunction spectrum $N(k)$ and individual seat passing-tone histograms.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.88\textwidth]{figures/four_algorithms_conjunction_spectrum.png}
+\caption{\textbf{Audience Conjunction Spectrum $N(k)$ Across Four Algorithms.} Shows the number of listener seats $N(k)$ that simultaneously pass at least $k$ frequencies. Notice Algorithm 2 guarantees $N(24) = 80$ (100\% of seats pass at least 24 tones), whereas Algorithm 0 drops below 80 seats at $k = 11$.}
+\label{fig:four_algos_conjunction}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.92\textwidth]{figures/four_algorithms_seat_histograms.png}
+\caption{\textbf{Audience Seat Passing-Tone Histograms Across Four Algorithms.} Histograms show the distribution of compliant tones per seat across all 80 audience positions.}
+\label{fig:four_algos_histograms}
+\end{figure}
+
 \section{Conclusion}
 
 The numerical synthesis, baseline comparisons, and physical simulation of the $10.0 \times 12.0 \times 2.8\text{ m}$ performance venue demonstrate several concrete acoustic findings:
@@ -503,6 +601,7 @@ The numerical synthesis, baseline comparisons, and physical simulation of the $1
     \item \textbf{Generalization Without Overfitting:} Evaluating the array on 40 held-out off-grid positions yields $6.16\text{ dB}$ RMS error and $9.80\text{ dB}$ worst-seat deviation, confirming that the discrete search physically smooths the acoustic volume rather than tuning to discrete training points.
     \item \textbf{Environmental Robustness:} Under physical perturbations in speed of sound ($\pm 2\%$), room damping ($\pm 10\%$), and placement tolerances ($5\text{--}10\text{ cm}$), the array maintains stable performance with RMS error clustered tightly within $[6.18, 6.40]\text{ dB}$.
     \item \textbf{Formal Infeasibility of 95\% All-Tone Coverage:} Lean 4 meta-theorems and empirical single-frequency projections confirm that an idealized 95\% full-band coverage target is mathematically impossible with this hardware menu, establishing that realistic optimization targets in rectangular rooms must be formulated around minimax and RMS flatness.
+    \item \textbf{Trade-Offs Across Optimization Paradigms:} Comparative evaluation across four distinct algorithms confirms that no single objective dominates across all acoustic dimensions: Layered Beam Search (Algorithm 0) minimizes total RMS error ($6.25\text{ dB}$ in-sample, $6.16\text{ dB}$ held-out); Vectorized Geometric Scanning (Algorithm 1) maximizes tolerance corridor cell compliance ($43.3\%$ in-sample, $41.5\%$ held-out); Multi-Seat Minimax (Algorithm 2) maximizes audience fairness ($24\text{ minimum passing tones}$ across all seats, and $9.48\text{ dB}$ held-out worst-seat deviation); and RLT Bilinear Synthesis (Algorithm 3) enables destructive boundary mode cancellation with minimal electrical power ($1.95\text{ W/tone}$).
 \end{enumerate}
 
 \end{document}

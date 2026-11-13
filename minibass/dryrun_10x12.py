@@ -110,6 +110,7 @@ def evaluate_system_configuration(
         "best_seat_pass": int(max(seat_tones)),
         "worst_seat_pass": int(min(seat_tones)),
         "median_seat_pass": float(np.median(seat_tones)),
+        "seat_tones": seat_tones,
         "total_power_w": tot_power,
         "mean_power_w": tot_power / n_freq,
     }

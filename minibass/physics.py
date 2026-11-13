@@ -106,8 +106,6 @@ def rectangular_transfer(
 
     # Modal norm inverse: prod((2/L if n > 0 else 1/L))
     inv_norm = np.prod(np.where(triples == 0, 1.0 / L, 2.0 / L), axis=1)
-    source_modes = np.prod(np.cos(np.pi * xs[:, None, :] * triples[None, :, :] / L), axis=2)
-    receiver_modes = np.prod(np.cos(np.pi * xr[:, None, :] * triples[None, :, :] / L), axis=2)
 
     omega = 2 * np.pi * fs
     delta = 6.91 / t60
@@ -115,13 +113,15 @@ def rectangular_transfer(
 
     for start in range(0, len(triples), mode_chunk):
         stop = min(start + mode_chunk, len(triples))
+        chunk_triples = triples[start:stop]
+        chunk_source = np.prod(np.cos(np.pi * xs[:, None, :] * chunk_triples[None, :, :] / L), axis=2)
+        chunk_receiver = np.prod(np.cos(np.pi * xr[:, None, :] * chunk_triples[None, :, :] / L), axis=2)
+
         lam = eigen2[start:stop, None]
         denom = lam - omega[None, :] ** 2 + 2j * delta * omega[None, :]
         weights = inv_norm[start:stop, None] * (1j * rho * omega[None, :] * c * c) / denom
-        for fi in range(len(fs)):
-            answer[:, :, fi] += (
-                source_modes[:, start:stop] * weights[:, fi]
-            ) @ receiver_modes[:, start:stop].T
+        chunk_sw = (chunk_source[:, None, :] * weights.T[None, :, :]).reshape(len(xs) * len(fs), stop - start)
+        answer += (chunk_sw @ chunk_receiver.T).reshape(len(xs), len(fs), len(xr)).transpose(0, 2, 1)
 
     return answer
 
