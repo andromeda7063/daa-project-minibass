@@ -74,73 +74,98 @@ def create_10x12_room_instance() -> dict[str, Any]:
 
 
 def create_driver_catalog() -> dict[str, Driver]:
-    """Discrete menu of high-compliance 10-inch and 12-inch transducers."""
+    """Discrete menu of high-compliance transducers from the benchmark catalog."""
     return {
         "s01": Driver(
             id="s01",
-            re_ohm=3.2,
-            le_h=0.0012,
-            bl_n_a=14.2,
-            moving_mass_kg=0.095,
-            compliance_m_n=0.00038,
-            resistance_n_s_m=2.8,
-            piston_area_m2=0.035,
-            diameter_m=0.26,
-            depth_m=0.14,
-            displaced_volume_m3=0.0022,
+            re_ohm=5.2,
+            le_h=0.00035,
+            bl_n_a=7.0,
+            moving_mass_kg=0.026,
+            compliance_m_n=0.00065,
+            resistance_n_s_m=1.5,
+            piston_area_m2=0.012,
+            diameter_m=0.16,
+            depth_m=0.09,
+            displaced_volume_m3=0.0005,
         ),
         "s02": Driver(
             id="s02",
-            re_ohm=3.4,
-            le_h=0.0014,
-            bl_n_a=15.8,
-            moving_mass_kg=0.120,
-            compliance_m_n=0.00032,
-            resistance_n_s_m=3.2,
-            piston_area_m2=0.035,
-            diameter_m=0.26,
-            depth_m=0.15,
-            displaced_volume_m3=0.0025,
+            re_ohm=6.1,
+            le_h=0.00045,
+            bl_n_a=9.0,
+            moving_mass_kg=0.040,
+            compliance_m_n=0.00050,
+            resistance_n_s_m=1.8,
+            piston_area_m2=0.018,
+            diameter_m=0.20,
+            depth_m=0.11,
+            displaced_volume_m3=0.0009,
         ),
         "s03": Driver(
             id="s03",
-            re_ohm=3.1,
-            le_h=0.0011,
-            bl_n_a=15.0,
-            moving_mass_kg=0.088,
+            re_ohm=4.5,
+            le_h=0.00060,
+            bl_n_a=10.0,
+            moving_mass_kg=0.055,
             compliance_m_n=0.00042,
-            resistance_n_s_m=2.5,
-            piston_area_m2=0.035,
-            diameter_m=0.26,
-            depth_m=0.14,
-            displaced_volume_m3=0.0021,
+            resistance_n_s_m=2.2,
+            piston_area_m2=0.024,
+            diameter_m=0.23,
+            depth_m=0.13,
+            displaced_volume_m3=0.0013,
         ),
         "s04": Driver(
             id="s04",
-            re_ohm=3.6,
-            le_h=0.0015,
-            bl_n_a=16.5,
-            moving_mass_kg=0.135,
-            compliance_m_n=0.00028,
-            resistance_n_s_m=3.5,
-            piston_area_m2=0.035,
+            re_ohm=6.5,
+            le_h=0.00070,
+            bl_n_a=12.0,
+            moving_mass_kg=0.075,
+            compliance_m_n=0.00032,
+            resistance_n_s_m=2.7,
+            piston_area_m2=0.030,
             diameter_m=0.26,
             depth_m=0.15,
-            displaced_volume_m3=0.0026,
+            displaced_volume_m3=0.0018,
+        ),
+        "s05": Driver(
+            id="s05",
+            re_ohm=5.5,
+            le_h=0.00080,
+            bl_n_a=13.0,
+            moving_mass_kg=0.090,
+            compliance_m_n=0.00028,
+            resistance_n_s_m=3.0,
+            piston_area_m2=0.035,
+            diameter_m=0.28,
+            depth_m=0.16,
+            displaced_volume_m3=0.0022,
+        ),
+        "s06": Driver(
+            id="s06",
+            re_ohm=7.0,
+            le_h=0.00050,
+            bl_n_a=11.0,
+            moving_mass_kg=0.060,
+            compliance_m_n=0.00038,
+            resistance_n_s_m=2.4,
+            piston_area_m2=0.026,
+            diameter_m=0.24,
+            depth_m=0.14,
+            displaced_volume_m3=0.0015,
         ),
     }
 
 
 def create_enclosure_designs() -> tuple[Design, ...]:
     """Discrete catalog of ported and sealed subwoofer enclosures."""
-    # box-1458bc9be8116c17: 10" ported cabinet (0.36 x 0.36 x 0.32m, 41.5L gross, 29.8L net)
     port_10 = Port(
         centre_m=(0.26, 0.26),
-        inner_radius_m=0.035,
-        outer_radius_m=0.040,
-        length_m=0.22,
-        effective_length_m=0.26,
-        resistance_pa_s_m3=180.0,
+        inner_radius_m=0.022,
+        outer_radius_m=0.026,
+        length_m=0.16,
+        effective_length_m=0.192,
+        resistance_pa_s_m3=250.0,
     )
     mount_s03 = DriverMount(driver_id="s03", centre_m=(0.18, 0.18))
     mount_s04 = DriverMount(driver_id="s04", centre_m=(0.18, 0.18))
@@ -228,7 +253,7 @@ def precompute_atom_tensors(
 
     for pos in range(n_pos):
         for des in designs:
-            source = evaluate_source(des, catalog, frequencies, DEFAULT_ENVIRONMENT, reference_voltage_v_rms=2.83)
+            source = evaluate_source(des, catalog, frequencies, DEFAULT_ENVIRONMENT, reference_voltage_v_rms=1.0)
             cone_q = source.cone_volume_velocity_m3_s_rms[0]  # shape: [F]
             port_q = source.port_outward_volume_velocity_m3_s_rms[0] if len(des.ports) > 0 else 0.0
             total_flow = cone_q + port_q  # shape: [F]

@@ -71,13 +71,13 @@ def evaluate_system_configuration(
             delay_s=float(ctl.get("delay_s", 0.0)),
         )
 
-        source = evaluate_source(designs[did], catalog, frequencies, DEFAULT_ENVIRONMENT, reference_voltage_v_rms=2.83)
+        source = evaluate_source(designs[did], catalog, frequencies, DEFAULT_ENVIRONMENT, reference_voltage_v_rms=1.0)
         q_cone = source.cone_volume_velocity_m3_s_rms[0]
         q_port = source.port_outward_volume_velocity_m3_s_rms[0] if len(designs[did].ports) > 0 else 0.0
         q_tot = (q_cone + q_port) * filt.response(frequencies)
 
         tot_p += transfer[pos] * q_tot[None, :]
-        tot_power += float(np.mean(source.input_power_w * np.abs(filt.response(frequencies)) ** 2))
+        tot_power += float(np.sum(source.input_power_w * np.abs(filt.response(frequencies)) ** 2))
 
     mag = np.abs(tot_p)
     lo = target_pa * 10 ** (-tol_db / 20.0)
@@ -111,6 +111,7 @@ def evaluate_system_configuration(
         "worst_seat_pass": int(min(seat_tones)),
         "median_seat_pass": float(np.median(seat_tones)),
         "total_power_w": tot_power,
+        "mean_power_w": tot_power / n_freq,
     }
 
 
